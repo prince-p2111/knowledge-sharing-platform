@@ -1,4 +1,4 @@
-const db = require("../../models/comment");
+const db = require("../../models/index");
 const User = db.user;
 const Comment = db.comment;
 const Article = db.article;
@@ -7,6 +7,7 @@ const {
   generateResponse,
 } = require("../../helper/response");
 const Joi = require("joi");
+const { where } = require("sequelize");
 
 const createComment = async (req, res) => {
   try {
@@ -90,7 +91,9 @@ const createComment = async (req, res) => {
 
     return res
       .status(201)
-      .json(generateResponse("Comment created successfully", responseData));
+      .json(
+        generateResponse(true, "Comment created successfully", responseData)
+      );
   } catch (error) {
     console.error("Error creating comment:", error);
     return res.status(500).json(generateErrorResponse("Internal server error"));

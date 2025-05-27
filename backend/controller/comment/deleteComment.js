@@ -11,7 +11,7 @@ const deleteComment = async (req, res) => {
   try {
     const commentId = parseInt(req.params.id);
     const userId = req.user.id;
-    const userRole = req.user.role; // assuming role is available in req.user
+    const userRole = req.user.role;
 
     if (isNaN(commentId)) {
       return res.status(400).json(generateErrorResponse("Invalid comment ID"));

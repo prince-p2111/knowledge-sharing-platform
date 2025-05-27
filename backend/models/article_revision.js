@@ -45,7 +45,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       revised_by: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         references: {
           model: "users",
           key: "id",

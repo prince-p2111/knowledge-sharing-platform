@@ -10,18 +10,21 @@ const Joi = require("joi");
 
 const updateArticle = async (req, res) => {
   try {
-    // Validate article ID parameter
-    const { error: paramError } = Joi.number()
-      .integer()
-      .positive()
-      .required()
-      .validate(req.params.id, {
-        abortEarly: false,
-        convert: false,
-      });
+    // Validate article ID param
+    const { error: paramError } = Joi.object({
+      id: Joi.string().required().pattern(/^\d+$/).messages({
+        "string.empty": "Article ID is required",
+        "string.pattern.base": "Article ID must be a valid number",
+      }),
+    }).validate(req.params, {
+      abortEarly: false,
+      convert: false,
+    });
 
     if (paramError) {
-      return res.status(400).json(generateErrorResponse("Invalid article ID"));
+      return res
+        .status(400)
+        .json(generateErrorResponse("Invalid article ID", paramError.details));
     }
 
     // Validate request body
@@ -88,11 +91,11 @@ const updateArticle = async (req, res) => {
           title: article.title,
           content: article.content,
           revised_by: userId,
+          revised_at: new Date(),
         },
         { transaction }
       );
 
-      // Update the article
       const updatedFields = {};
       if (value.title) updatedFields.title = value.title;
       if (value.content) updatedFields.content = value.content;
@@ -100,10 +103,10 @@ const updateArticle = async (req, res) => {
 
       await article.update(updatedFields, { transaction });
 
-      // Commit transaction
+      // Commit the transaction BEFORE any further queries
       await transaction.commit();
 
-      // Get updated article with author info
+      // Now safely do post-commit queries WITHOUT transaction
       const updatedArticle = await Article.findOne({
         where: { id: articleId },
         include: [
@@ -113,17 +116,20 @@ const updateArticle = async (req, res) => {
             attributes: ["id", "name", "email"],
           },
         ],
-        transaction,
       });
 
-      // Get revision count
       const revisionCount = await db.article_revision.count({
         where: { article_id: articleId },
-        transaction,
       });
 
       // Prepare response
       const responseData = {
+        article: {
+          id: updatedArticle.id,
+          title: updatedArticle.title,
+          content: updatedArticle.content,
+          tags: updatedArticle.tags,
+        },
         id: updatedArticle.id,
         title: updatedArticle.title,
         content: updatedArticle.content,
@@ -139,7 +145,9 @@ const updateArticle = async (req, res) => {
 
       return res
         .status(200)
-        .json(generateResponse("Article updated successfully", responseData));
+        .json(
+          generateResponse(true, "Article updated successfully", responseData)
+        );
     } catch (error) {
       await transaction.rollback();
       throw error;

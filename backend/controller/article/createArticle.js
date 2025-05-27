@@ -41,6 +41,7 @@ const createArticle = async (req, res) => {
         .status(400)
         .json(generateErrorResponse("Validation error", errors));
     }
+    console.log("value >> ", value.tags);
 
     // Get user ID from authenticated request (assuming you have auth middleware)
     const userId = req.user.id;
@@ -50,22 +51,25 @@ const createArticle = async (req, res) => {
     if (!user) {
       return res.status(404).json(generateErrorResponse("User not found"));
     }
+    console.log(value.tags);
 
     // Create article
     const article = await Article.create({
       title: value.title,
       content: value.content,
-      tags: value.tags || null, // Handle optional tags
+      tags: value.tags,
       created_by: userId,
     });
 
     // Include author information in response
     const responseData = {
-      id: article.id,
-      title: article.title,
-      content: article.content,
-      tags: article.tags,
-      created_at: article.created_at,
+      article: {
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        tags: article.tags,
+        created_at: article.created_at,
+      },
       author: {
         id: user.id,
         name: user.name,

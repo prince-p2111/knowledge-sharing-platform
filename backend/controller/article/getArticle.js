@@ -56,16 +56,21 @@ const getArticles = async (req, res) => {
         ],
       });
 
+      console.log(article.summary.summary);
+      
+
       if (!article) {
         return res.status(404).json(generateErrorResponse("Article not found"));
       }
 
       const responseData = {
-        id: article.id,
-        title: article.title,
-        content: article.content,
-        tags: article.tags,
-        created_at: article.created_at,
+        article: {
+          id: article.id,
+          title: article.title,
+          content: article.content,
+          tags: article.tags,
+          created_at: article.created_at,
+        },
         version: article.revisions.length + 1, // Current version
         author: {
           id: article.author.id,
@@ -87,7 +92,9 @@ const getArticles = async (req, res) => {
 
       return res
         .status(200)
-        .json(generateResponse("Article fetched successfully", responseData));
+        .json(
+          generateResponse(true, "Article fetched successfully", responseData)
+        );
     }
 
     // Multiple articles fetch with pagination
@@ -108,7 +115,7 @@ const getArticles = async (req, res) => {
         },
       ],
       order: [["created_at", "DESC"]],
-      attributes: ["id", "title", "created_at", "tags"],
+      attributes: ["id", "title", "content", "created_at", "tags"],
     });
 
     const totalPages = Math.ceil(count / limit);
@@ -117,6 +124,7 @@ const getArticles = async (req, res) => {
       articles: articles.map((article) => ({
         id: article.id,
         title: article.title,
+        content: article.content.substring(0, 100) + "...", // Preview content
         tags: article.tags,
         created_at: article.created_at,
         summary: article.summary?.summary || null,
@@ -137,7 +145,9 @@ const getArticles = async (req, res) => {
 
     return res
       .status(200)
-      .json(generateResponse("Articles fetched successfully", responseData));
+      .json(
+        generateResponse(true, "Articles fetched successfully", responseData)
+      );
   } catch (error) {
     console.error("Error fetching articles:", error);
     return res.status(500).json(generateErrorResponse("Internal server error"));

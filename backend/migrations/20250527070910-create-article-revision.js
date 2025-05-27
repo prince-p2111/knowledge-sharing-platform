@@ -34,7 +34,6 @@ module.exports = {
       },
       revised_by: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: "users",
           key: "id",
@@ -42,13 +41,20 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "SET NULL",
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      deleted_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: null,
       },
     });
   },

@@ -32,9 +32,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      tags: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
       created_by: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         references: {
           model: "users",
           key: "id",

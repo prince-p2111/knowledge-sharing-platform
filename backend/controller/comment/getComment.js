@@ -1,4 +1,4 @@
-const db = require("../../models/comment");
+const db = require("../../models/index");
 const User = db.user;
 const Comment = db.comment;
 const Article = db.article;
@@ -36,36 +36,24 @@ const getComment = async (req, res) => {
     const commentId = value.id;
 
     // Fetch the comment with author and article details
-    const comment = await Comment.findByPk(commentId, {
+    const comments = await Comment.findAll({
+      where: { article_id: commentId },
       include: [
         {
           model: User,
-          as: "author",
-          attributes: ["id", "name", "email"],
-        },
-        {
-          model: Article,
-          as: "article",
-          attributes: ["id", "title"],
+          as: "author", // must match the alias defined in associations
+          attributes: ["id", "name"], // optional: select user fields you want
         },
       ],
     });
 
-    if (!comment) {
+    if (!comments) {
       return res.status(404).json(generateErrorResponse("Comment not found"));
     }
 
-    const responseData = {
-      id: comment.id,
-      content: comment.content,
-      created_at: comment.created_at,
-      author: comment.author,
-      article: comment.article,
-    };
-
     return res
       .status(200)
-      .json(generateResponse("Comment fetched successfully", responseData));
+      .json(generateResponse(true, "Comment fetched successfully", comments));
   } catch (error) {
     console.error("Error fetching comment:", error);
     return res.status(500).json(generateErrorResponse("Internal server error"));

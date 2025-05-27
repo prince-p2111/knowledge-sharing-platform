@@ -37,7 +37,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       created_by: {
         type: DataTypes.INTEGER,
-        allowNull: false,
         references: {
           model: "users",
           key: "id",

@@ -6,9 +6,10 @@ const {
   getComment,
   updateComment,
 } = require("../controller/comment/comment.controller");
+const authMiddleware = require("../middleware/authMiddleware");
 
-route.get("/get-comment", getComment);
-route.post("/create-comment", createComment);
+route.get("/get-comment/:id", getComment);
+route.post("/create-comment", authMiddleware, createComment);
 route.put("/update-comment/:id", updateComment);
 route.delete("/delete-comment/:id", deleteComment);
 

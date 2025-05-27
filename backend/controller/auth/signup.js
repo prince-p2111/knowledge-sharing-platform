@@ -27,10 +27,10 @@ const signup = async (req, res) => {
         .json(generateErrorResponse("User already exists with this email"));
     }
 
-    const hashedPassword = await bcrypt.hash(confirmPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await user.create({
-      name: userName,
+      name: name,
       email,
       password: hashedPassword,
       role: role,
@@ -45,6 +45,7 @@ const signup = async (req, res) => {
       })
     );
   } catch (error) {
+    console.log("Sign up API :", error);
     return res
       .status(500)
       .json(generateErrorResponse("Internal server error", error));
