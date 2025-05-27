@@ -8,6 +8,8 @@ const path = require("path");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth.route");
+const articleRoute = require("./routes/article.route");
+const commentRoute = require("./routes/comment.route");
 
 // cors settings
 app.use(
@@ -33,6 +35,8 @@ app.use(morgan("dev"));
 
 // Routes
 app.use("/api/auth", authRoute);
+app.use("/api/articles", articleRoute);
+app.use("/api/comment", commentRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
