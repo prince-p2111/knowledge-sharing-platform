@@ -7,6 +7,7 @@ const cors = require("cors");
 const path = require("path");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const authRoute = require("./routes/auth.route");
 
 // cors settings
 app.use(
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 
 // Routes
+app.use("/api/auth", authRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
